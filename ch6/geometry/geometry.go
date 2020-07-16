@@ -5,11 +5,16 @@
 
 // Package geometry defines simple types for plane geometry.
 //!+point
-package geometry
+package main
 
-import "math"
+import (
+	"fmt"
+	"math"
+)
 
-type Point struct{ X, Y float64 }
+type Point struct {
+	X, Y float64
+}
 
 // traditional function
 func Distance(p, q Point) float64 {
@@ -19,6 +24,17 @@ func Distance(p, q Point) float64 {
 // same thing, but as a method of the Point type
 func (p Point) Distance(q Point) float64 {
 	return math.Hypot(q.X-p.X, q.Y-p.Y)
+}
+
+// if the receiver need to be update, pass a pointer
+func (p *Point) ScaleBy(factor float64) {
+	p.X *= factor
+	p.Y *= factor
+}
+
+func (p Point) foo(factor float64) {
+	p.X *= factor
+	p.Y *= factor
 }
 
 //!-point
@@ -37,6 +53,24 @@ func (path Path) Distance() float64 {
 		}
 	}
 	return sum
+}
+
+func main() {
+	p := Point{
+		X: 1,
+		Y: 2,
+	}
+	fmt.Printf("%+v", p)
+
+	p.ScaleBy(3)
+	fmt.Printf("%+v", p)
+
+	(&p).ScaleBy(4)
+	fmt.Printf("%+v", p)
+
+	(&p).foo(4)
+	fmt.Printf("%+v", p)
+
 }
 
 //!-path

@@ -4,7 +4,7 @@
 // See page 165.
 
 // Package intset provides a set of integers based on a bit vector.
-package intset
+package main
 
 import (
 	"bytes"
@@ -34,6 +34,31 @@ func (s *IntSet) Add(x int) {
 	s.words[word] |= 1 << bit
 }
 
+func (s *IntSet) AddAll(xs ...int) {
+	for _, item := range xs {
+		s.Add(item)
+	}
+}
+
+func (s *IntSet) Remove(x int) {
+	idx, bit := x/64, uint(x%64)
+	if idx >= len(s.words) {
+		return
+	}
+	s.words[idx] &= ^(1 << bit) // flip bits by ^
+}
+
+func (s *IntSet) Clear() {
+	s.words = nil
+}
+
+func (s *IntSet) Copy() *IntSet {
+	result := IntSet{words: make([]uint64, len(s.words))}
+	copy(result.words, s.words)
+
+	return &result
+}
+
 // UnionWith sets s to the union of s and t.
 func (s *IntSet) UnionWith(t *IntSet) {
 	for i, tword := range t.words {
@@ -45,9 +70,20 @@ func (s *IntSet) UnionWith(t *IntSet) {
 	}
 }
 
-//!-intset
-
-//!+string
+func (s *IntSet) Len() int {
+	result := 0
+	for _, word := range s.words {
+		if word == 0 {
+			continue
+		}
+		for j := 0; j < 64; j++ {
+			if word&(1<<uint(j)) != 0 {
+				result += 1
+			}
+		}
+	}
+	return result
+}
 
 // String returns the set as a string of the form "{1 2 3}".
 func (s *IntSet) String() string {
@@ -70,4 +106,33 @@ func (s *IntSet) String() string {
 	return buf.String()
 }
 
-//!-string
+func main() {
+	var x, y IntSet
+	x.Add(1)
+
+	x.Clear()
+	fmt.Println(x.String())
+
+	x.Add(144)
+	x.Add(9)
+	fmt.Println(x.String())
+
+	x.Remove(144)
+	fmt.Println(x.String())
+
+	y.Add(9)
+	y.Add(42)
+	fmt.Println(y.String())
+
+	x.UnionWith(&y)
+	fmt.Println(x.String())
+
+	fmt.Println(x.Has(9), x.Has(123))
+
+	fmt.Println(x.Len())
+
+	fmt.Println("----Test Copy------")
+	a := x.Copy()
+	fmt.Println(&x)
+	fmt.Println(a)
+}

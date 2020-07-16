@@ -10,8 +10,7 @@ package links
 import (
 	"fmt"
 	"net/http"
-
-	"golang.org/x/net/html"
+	//"golang.org/x/net/html"
 )
 
 // Extract makes an HTTP GET request to the specified URL, parses

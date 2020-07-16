@@ -8,14 +8,12 @@ package main
 
 import (
 	"fmt"
+	"gopl.io/ch7/eval"
 	"io"
 	"log"
 	"math"
 	"net/http"
 )
-
-//!+parseAndCheck
-import "gopl.io/ch7/eval"
 
 //!-parseAndCheck
 
